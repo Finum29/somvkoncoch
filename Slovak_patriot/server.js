@@ -10,6 +10,7 @@ const cron = require('node-cron');
 
 const app = express();
 const server = http.createServer(app);
+
 const wss = new WebSocket.Server({ server });
 
 
@@ -21,9 +22,6 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 
 const USERS_FILE = path.join(__dirname, 'users.json');
 const EVENTS_FILE = path.join(__dirname, 'events.json');
