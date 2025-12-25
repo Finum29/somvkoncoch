@@ -12,7 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // Serve static React build files instead of 'public'
 app.use(express.static(path.join(__dirname, 'build')));
@@ -1888,3 +1888,4 @@ server.listen(PORT, () => {
   console.log(`Slovak Patriot server running at http://localhost:${PORT}`);
   console.log('WebSocket server is ready for chat connections');
 });
+
