@@ -12,17 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const PORT = process.env.PORT || 3000;
-
-// Serve static React build files instead of 'public'
-app.use(express.static(path.join(__dirname, 'build')));
-
-// Serve React app for all non-API routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-
-// JSON file paths
+const PORT = 3000;
 const USERS_FILE = path.join(__dirname, 'users.json');
 const EVENTS_FILE = path.join(__dirname, 'events.json');
 const TEAMS_FILE = path.join(__dirname, 'teams.json');
@@ -31,17 +21,6 @@ const CHAT_FILE = path.join(__dirname, 'chat.json');
 const RESET_TOKENS_FILE = path.join(__dirname, 'reset-tokens.json');
 const PUSH_SUBSCRIPTIONS_FILE = path.join(__dirname, 'push-subscriptions.json');
 const TOURNAMENT_CHAT_FILE = path.join(__dirname, 'tournament-chat.json');
-
-// Example: parse JSON body
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Your WebSocket, cron jobs, API routes, etc. go here
-
-// Start server
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 
 // --- Helper functions for data persistence ---
 function readJSON(file, defaultValue = []) {
@@ -77,10 +56,10 @@ readJSON(PUSH_SUBSCRIPTIONS_FILE, []);
 readJSON(TOURNAMENT_CHAT_FILE, []);
 
 // Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
+app.use('/'bodyParser.urlencoded({ extended: true }));
+app.use('/'bodyParser.json());
+app.use('/'express.static(path.join(__dirname, 'public')));
+app.use('/'session({
   secret: 'slovak_patriot_secret_2024',
   resave: false,
   saveUninitialized: false,
@@ -1888,5 +1867,3 @@ server.listen(PORT, () => {
   console.log(`Slovak Patriot server running at http://localhost:${PORT}`);
   console.log('WebSocket server is ready for chat connections');
 });
-
-
