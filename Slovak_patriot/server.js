@@ -12,7 +12,19 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const PORT = 3000;
+
+const PORT = process.env.PORT || 3000;
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
 const USERS_FILE = path.join(__dirname, 'users.json');
 const EVENTS_FILE = path.join(__dirname, 'events.json');
 const TEAMS_FILE = path.join(__dirname, 'teams.json');
