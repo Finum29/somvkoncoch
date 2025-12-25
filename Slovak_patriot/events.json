@@ -1,0 +1,83 @@
+[
+  {
+    "id": "1766679716930",
+    "name": "CounterStrike 2 ",
+    "description": "A leauge of legends tournament ",
+    "date": "2025-12-25",
+    "time": "19:00",
+    "mode": "solo",
+    "eliminationType": "single",
+    "iconUrl": "../images/LOL.png",
+    "streamUrl": "https://www.youtube.com/watch?v=YkPPbRDq41Y",
+    "lobbyUrl": "",
+    "teamSize": null,
+    "entryFee": 0,
+    "prizePool": {
+      "first": 10,
+      "second": 5,
+      "third": 2
+    },
+    "prizes": {},
+    "status": "upcoming",
+    "registrations": [
+      {
+        "type": "solo",
+        "userId": "1763998692997",
+        "username": "finum29",
+        "registeredAt": "2025-12-25T16:22:10.795Z",
+        "checkedIn": false,
+        "paidEntry": false
+      },
+      {
+        "type": "solo",
+        "userId": "1764144913053",
+        "username": "RichardMoravansky",
+        "registeredAt": "2025-12-25T16:23:05.598Z",
+        "checkedIn": false,
+        "paidEntry": false
+      }
+    ],
+    "matches": [],
+    "bracket": [
+      [
+        {
+          "matchId": "R0-M0",
+          "round": 0,
+          "participant1": {
+            "id": "1763998692997",
+            "name": "finum29",
+            "checkedIn": false
+          },
+          "participant2": {
+            "id": "1764144913053",
+            "name": "RichardMoravansky",
+            "checkedIn": false
+          },
+          "winner": null,
+          "scheduledTime": null
+        },
+        {
+          "matchId": "R0-M1",
+          "round": 0,
+          "participant1": null,
+          "participant2": null,
+          "winner": null,
+          "scheduledTime": null
+        }
+      ],
+      [
+        {
+          "matchId": "R1-M0",
+          "round": 1,
+          "participant1": null,
+          "participant2": null,
+          "winner": null,
+          "scheduledTime": null
+        }
+      ]
+    ],
+    "loserBracket": null,
+    "winner": null,
+    "createdAt": "2025-12-25T16:21:56.935Z"
+  }
+]

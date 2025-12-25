@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Slovenskí Patrioti</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="../images/SPlogo-edited.png" type="image/png">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav-fixed">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="../images/SPlogo-web-nav-edited.png" alt="Slovak Patriot Logo" onclick="window.location.href='../index.html'">
+      </div>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="admin.html">Admin Panel</a>
+      </div>
+      <div class="nav-auth">
+        <span class="nav-user"></span>
+        <button class="nav-logout">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="admin-container">
+    <h1>Admin Panel</h1>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="players">Players</button>
+      <button class="tab" data-tab="teams">Teams</button>
+      <button class="tab" data-tab="events">Events</button>
+      <button class="tab" data-tab="support">Support</button>
+      <button class="tab" data-tab="management">Event Management</button>
+    </div>
+
+    <!-- Players Tab -->
+    <div class="tab-content active" id="players">
+      <h2>Player Management</h2>
+      <div id="playersList"></div>
+    </div>
+
+    <!-- Teams Tab -->
+    <div class="tab-content" id="teams">
+      <h2>Team Management</h2>
+      <div id="teamsList"></div>
+    </div>
+
+    <!-- Events Tab -->
+    <div class="tab-content" id="events">
+      <h2>Event Management</h2>
+      
+      <!-- Create Event Form -->
+      <div class="event-form">
+        <h3>Create New Event</h3>
+        <form id="createEventForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eventName">Event Name</label>
+              <input type="text" id="eventName" required>
+            </div>
+            <div class="form-group">
+              <label for="eventDate">Date</label>
+              <input type="date" id="eventDate" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eventTime">Time</label>
+              <input type="time" id="eventTime" required>
+            </div>
+            <div class="form-group">
+              <label for="eventMode">Mode</label>
+              <select id="eventMode" required>
+                <option value="solo">Solo Only</option>
+                <option value="team">Team Only</option>
+                <option value="both">Both</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eventElimination">Elimination Type</label>
+              <select id="eventElimination" required>
+                <option value="single">Single Elimination</option>
+                <option value="double">Double Elimination</option>
+              </select>
+            </div>
+            <div class="form-group" id="teamSizeGroup" style="display: none;">
+              <label for="eventTeamSize">Team Size (players per team)</label>
+              <select id="eventTeamSize">
+                <option value="">No limit</option>
+                <option value="1">1v1</option>
+                <option value="2">2v2</option>
+                <option value="3">3v3</option>
+                <option value="4">4v4</option>
+                <option value="5">5v5 (Max)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="eventDescription">Description</label>
+            <textarea id="eventDescription" rows="3" style="width: 100%; padding: 14px; border: 2px solid var(--black-lighter); border-radius: 6px; background: var(--black); color: var(--white); font-size: 1rem; font-family: inherit;"></textarea>
+          </div>
+          <button type="submit" class="btn btn-activate">Create Event</button>
+        </form>
+      </div>
+
+      <!-- Events List -->
+      <div id="eventsList"></div>
+    </div>
+
+    <!-- Support Tab -->
+    <div class="tab-content" id="support">
+      <h2>Support Tickets</h2>
+      <div id="ticketsList"></div>
+    </div>
+
+    <!-- Event Management Tab -->
+    <div class="tab-content" id="management">
+      <h2>Event Management</h2>
+      <p>Select an event to view registrations and manage tournament brackets</p>
+      <div id="eventManagement"></div>
+    </div>
+  </div>
+
+  <script src="../scripts/auth.js"></script>
+  <script src="../scripts/admin.js"></script>
+</body>
+</html>

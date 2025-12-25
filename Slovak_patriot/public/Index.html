@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slovenskí Patrioti - Esports Tournament Platform</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="images/SPlogo-edited.png" type="image/png">
+</head>
+<body>
+  <!-- Fixed Navigation -->
+  <nav class="nav-fixed">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="images/SPlogo-web-nav-edited.png" alt="Slovak Patriot Logo" onclick="window.location.href='index.html'">
+      </div>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="#events">Events</a>
+        <a href="#games">Games</a>
+        <a href="#support">Support</a>
+        <a href="undersites/tournament-chat.html" class="nav-chat" style="display:none;">Live Chat</a>
+        <a href="undersites/my-tickets.html" class="nav-tickets" style="display:none;">My Tickets</a>
+        <a href="undersites/admin.html" class="nav-admin" style="display:none;">Admin Panel</a>
+      </div>
+      <div class="nav-auth">
+        <a class="nav-login" href="undersites/login.html">Login</a>
+        <a class="nav-signup" href="undersites/signup.html">Sign Up</a>
+        <span class="nav-user" style="display:none;"></span>
+        <button class="nav-create-team" style="display:none;">Create Team</button>
+        <button class="nav-join-team" style="display:none;">Join Team</button>
+        <button class="nav-view-team" style="display:none;">View Team</button>
+        <button class="nav-logout" style="display:none;">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header Section -->
+  <header>
+    <h1>Welcome Comrade to Slovak Patriot</h1>
+    <p>Compete, Win, and Rise to the Top</p>
+  </header>
+
+  <!-- Events Section -->
+  <section id="events" class="event-library">
+    <h2>Tournament Events</h2>
+    <div class="event-scroll-wrapper">
+      <div class="event-scroll" id="eventScroll">
+        <!-- Events will be loaded dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Event Registration Modal -->
+  <div class="modal" id="eventModal">
+    <div class="modal-content">
+      <h3 id="modalEventName">Event Name</h3>
+      <p id="modalEventDetails">Event details will appear here</p>
+      <div class="modal-buttons" id="modalButtons">
+        <!-- Buttons will be added dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Team Modal -->
+  <div class="modal" id="joinTeamModal" style="display:none;">
+    <div class="modal-content">
+      <h3>Join Team with Invite Code</h3>
+      <p style="color: var(--gray); margin-bottom: 15px;">Ask your team captain for the invite code and paste it below:</p>
+      <div id="joinTeamMessage"></div>
+      <form id="joinTeamForm" style="margin-top: 20px;">
+        <div class="form-group">
+          <label for="inviteCode" style="display: block; margin-bottom: 8px; color: var(--white);">Team Invite Code</label>
+          <input type="text" id="inviteCode" name="inviteCode" placeholder="Enter 8-character code" required style="width: 100%; padding: 12px; border: 2px solid var(--black-lighter); border-radius: 6px; background: var(--black); color: var(--white); font-size: 1rem; text-transform: uppercase;">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button type="submit" class="btn-join-team" style="flex: 1;">Join Team</button>
+          <button type="button" class="btn-cancel" onclick="closeJoinTeamModal()" style="flex: 1;">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Game Arsenal Section -->
+  <section id="games" class="game-arsenal">
+    <h2>Arsenal of Games</h2>
+    <div class="game-slider-wrapper">
+      <div class="game-slider" id="gameSlider">
+        <!-- Games will be duplicated for seamless loop -->
+        <div class="game-item">
+          <div class="game-img-container">
+            <img src="images/valorant.png" alt="Valorant">
+          </div>
+          <div class="game-info">
+            <h3>Valorant</h3>
+          </div>
+        </div>
+        <div class="game-item">
+          <div class="game-img-container">
+            <img src="images/LOL.png" alt="League of Legends">
+          </div>
+          <div class="game-info">
+            <h3>League of Legends</h3>
+          </div>
+        </div>
+        <div class="game-item">
+          <div class="game-img-container">
+            <img src="images/F-one.png" alt="F1">
+          </div>
+          <div class="game-info">
+            <h3>F1 Racing</h3>
+          </div>
+        </div>
+        <!-- Duplicate for seamless loop -->
+        <div class="game-item">
+          <div class="game-img-container">
+            <img src="images/valorant.png" alt="Valorant">
+          </div>
+          <div class="game-info">
+            <h3>Valorant</h3>
+          </div>
+        </div>
+        <div class="game-item">
+          <div class="game-img-container">
+            <img src="images/LOL.png" alt="League of Legends">
+          </div>
+          <div class="game-info">
+            <h3>League of Legends</h3>
+          </div>
+        </div>
+        <div class="game-item">
+          <div class="game-img-container">
+            <img src="images/F-one.png" alt="F1">
+          </div>
+          <div class="game-info">
+            <h3>F1 Racing</h3>
+          </div>
+        </div>
+		  
+		   <div class="game-item">
+          <div class="game-img-container">
+            <img src="images/valorant.png" alt="Valorant">
+          </div>
+          <div class="game-info">
+            <h3>Valorant</h3>
+          </div>
+        </div>
+        <div class="game-item">
+          <div class="game-img-container">
+            <img src="images/LOL.png" alt="League of Legends">
+          </div>
+          <div class="game-info">
+            <h3>League of Legends</h3>
+          </div>
+        </div>
+        <div class="game-item">
+          <div class="game-img-container">
+            <img src="images/F-one.png" alt="F1">
+          </div>
+          <div class="game-info">
+            <h3>F1 Racing</h3>
+          </div>
+        </div>
+		  
+      </div>
+    </div>
+  </section>
+
+  <!-- Support Section -->
+  <section id="support" class="support-section">
+    <h2>Need Help?</h2>
+    <p>Contact our support team for any issues or questions</p>
+    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+      <a href="undersites/support.html" class="btn-support">Submit a Ticket</a>
+      <a href="undersites/my-tickets.html" class="btn-support" style="background: #4444FF;">View My Tickets</a>
+     
+    </div>
+  </section>
+
+  <!-- Team Display Area -->
+  <div id="teamDisplay"></div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2024 Slovenskí Patrioti. All rights reserved.</p>
+  </footer>
+
+  <script src="scripts/auth.js"></script>
+  <script src="scripts/events.js"></script>
+  <script src="scripts/teams.js"></script>
+  <script src="scripts/notifications.js"></script>
+  <script src="scripts/brackets.js"></script>
+</body>
+</html>

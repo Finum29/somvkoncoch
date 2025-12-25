@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tournament Chat - Slovenskí Patrioti</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="../images/SPlogo-edited.png" type="image/png">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav-fixed">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="../images/SPlogo-web-nav-edited.png" alt="Slovak Patriot Logo" onclick="window.location.href='../index.html'">
+      </div>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="tournament-chat.html">Tournament Chat</a>
+      </div>
+      <div class="nav-auth">
+        <span class="nav-user"></span>
+        <button class="nav-logout">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="admin-container">
+    <h1>Tournament Chat</h1>
+
+    <!-- Chat Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="team-chat">Team Chat</button>
+      <button class="tab" data-tab="captain-chat" style="display:none;">Captain Chat</button>
+    </div>
+
+    <!-- Team Chat Tab -->
+    <div class="tab-content active" id="team-chat">
+      <div style="background: var(--black-light); padding: 20px; border-radius: 10px;">
+        <h3 style="color: var(--accent-red); margin-bottom: 15px;">Team Chat</h3>
+        <p style="color: var(--gray); margin-bottom: 20px;">Chat with your team members</p>
+        
+        <div id="teamChatHistory" style="height: 400px; overflow-y: auto; background: var(--black); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 2px solid var(--black-lighter);"></div>
+        
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="teamChatInput" placeholder="Type your message..." style="flex: 1; padding: 12px; border: 2px solid var(--black-lighter); border-radius: 6px; background: var(--black); color: var(--white); font-size: 1rem;">
+          <button class="btn btn-activate" onclick="sendTeamMessage()" style="padding: 12px 24px;">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Captain Chat Tab -->
+    <div class="tab-content" id="captain-chat">
+      <div style="background: var(--black-light); padding: 20px; border-radius: 10px;">
+        <h3 style="color: var(--accent-red); margin-bottom: 15px;">Captain to Captain Chat</h3>
+        <p style="color: var(--gray); margin-bottom: 20px;">Chat with opposing team captain and admins</p>
+        
+        <div id="captainChatHistory" style="height: 400px; overflow-y: auto; background: var(--black); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 2px solid var(--black-lighter);"></div>
+        
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="captainChatInput" placeholder="Type your message..." style="flex: 1; padding: 12px; border: 2px solid var(--black-lighter); border-radius: 6px; background: var(--black); color: var(--white); font-size: 1rem;">
+          <button class="btn btn-activate" onclick="sendCaptainMessage()" style="padding: 12px 24px;">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../scripts/auth.js"></script>
+  <script src="../scripts/tournament-chat.js"></script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Tickets - Slovenskí Patrioti</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="../images/SPlogo-edited.png" type="image/png">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav-fixed">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="../images/SPlogo-web-nav-edited.png" alt="Slovak Patriot Logo" onclick="window.location.href='../index.html'">
+      </div>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="support.html">Submit Ticket</a>
+        <a href="my-tickets.html">My Tickets</a>
+      </div>
+      <div class="nav-auth">
+        <span class="nav-user"></span>
+        <button class="nav-logout">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="auth-container">
+    <div class="auth-box" style="max-width: 900px;">
+      <h2>My Support Tickets</h2>
+      <div id="loginRequired" style="display:none;">
+        <div class="error-message">
+          Please <a href="login.html" style="color: var(--accent-red); text-decoration: underline;">login</a> to view your tickets.
+        </div>
+      </div>
+      <div id="ticketsContainer" style="display:none;">
+        <div id="ticketsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../scripts/auth.js"></script>
+  <script>
+    let ws = null;
+    let currentUser = null;
+    let activeTicketId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const sessionResponse = await fetch('/session');
+      const sessionData = await sessionResponse.json();
+
+      const loginRequired = document.getElementById('loginRequired');
+      const ticketsContainer = document.getElementById('ticketsContainer');
+
+      if (!sessionData.loggedIn) {
+        loginRequired.style.display = 'block';
+        ticketsContainer.style.display = 'none';
+      } else {
+        currentUser = sessionData.user;
+        loginRequired.style.display = 'none';
+        ticketsContainer.style.display = 'block';
+        loadMyTickets();
+        initializeChat();
+      }
+    });
+
+    function initializeChat() {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        ws = new WebSocket(`${protocol}//${window.location.host}`);
+      
+        ws.onopen = () => {
+          console.log('Connected to Chat');
+          // Authenticate
+          ws.send(JSON.stringify({
+            type: 'auth',
+            userId: currentUser.id,
+            username: currentUser.username,
+            isAdmin: currentUser.isAdmin
+          }));
+        };
+      
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          
+          if (activeTicketId) {
+              if (data.type === 'history') {
+                displayChatHistory(data.messages);
+              } else if (data.type === 'message') {
+                displayMessage(data.message);
+              }
+          }
+        };
+        
+        ws.onclose = () => {
+            setTimeout(initializeChat, 3000);
+        };
+    }
+
+    function joinTicketRoom(ticketId) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            activeTicketId = ticketId;
+            ws.send(JSON.stringify({
+                type: 'auth',
+                userId: currentUser.id,
+                username: currentUser.username,
+                isAdmin: currentUser.isAdmin,
+                room: `ticket-${ticketId}`
+            }));
+        }
+    }
+
+    function sendMessage(ticketId) {
+        const input = document.getElementById(`chat-input-${ticketId}`);
+        const message = input.value.trim();
+        
+        if (message && ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'message',
+                userId: currentUser.id,
+                username: currentUser.username,
+                message: message,
+                isAdmin: currentUser.isAdmin,
+                room: `ticket-${ticketId}`
+            }));
+            input.value = '';
+        }
+    }
+
+    async function loadMyTickets() {
+      try {
+        const response = await fetch('/tickets/my');
+        const data = await response.json();
+
+        if (data.ok) {
+          displayTickets(data.tickets);
+        }
+      } catch (error) {
+        console.error('Error loading tickets:', error);
+      }
+    }
+
+    function displayTickets(tickets) {
+      const ticketsList = document.getElementById('ticketsList');
+      
+      if (tickets.length === 0) {
+        ticketsList.innerHTML = '<p style="color: var(--gray); text-align: center;">You have no support tickets yet.</p>';
+        return;
+      }
+
+      ticketsList.innerHTML = tickets.map(ticket => `
+        <div class="admin-card" style="margin-bottom: 20px;">
+          <div class="card-header">
+            <h3>${ticket.subject}</h3>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              ${ticket.hasUnreadResponse ? '<span style="background: var(--accent-red); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">NEW RESPONSE</span>' : ''}
+              <span style="color: ${ticket.status === 'open' ? 'var(--accent-red)' : 'var(--gray)'};">
+                ${ticket.status.toUpperCase()}
+              </span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p><strong>Your Message:</strong></p>
+            <p style="color: var(--gray); margin-top: 8px;">${ticket.message}</p>
+            <p style="margin-top: 10px;"><strong>Submitted:</strong> ${new Date(ticket.createdAt).toLocaleString()}</p>
+            ${ticket.closedAt ? `<p><strong>Closed:</strong> ${new Date(ticket.closedAt).toLocaleString()}</p>` : ''}
+            
+            <div style="margin-top: 20px;">
+                <button class="btn btn-edit" onclick="toggleChat('${ticket.id}')">Open Chat</button>
+            </div>
+
+            <div id="chat-container-${ticket.id}" style="display:none; margin-top: 15px; background: var(--black); padding: 15px; border-radius: 6px;">
+                <div id="chat-history-${ticket.id}" style="height: 300px; overflow-y: auto; margin-bottom: 15px; border-bottom: 1px solid var(--gray); padding-right: 10px;"></div>
+                ${ticket.status === 'open' ? `
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="chat-input-${ticket.id}" placeholder="Type a message..." style="flex: 1; padding: 10px; border-radius: 4px; border: none; background: var(--black-lighter); color: white;">
+                        <button class="btn btn-activate" onclick="sendMessage('${ticket.id}')">Send</button>
+                    </div>
+                ` : '<p style="color: var(--gray); text-align: center;">This ticket is closed. You cannot send new messages.</p>'}
+            </div>
+
+          </div>
+          ${ticket.hasUnreadResponse ? `
+            <div class="card-actions">
+              <button class="btn btn-activate" onclick="markAsRead('${ticket.id}')">Mark as Read</button>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    function toggleChat(ticketId) {
+        const container = document.getElementById(`chat-container-${ticketId}`);
+        if (container.style.display === 'none') {
+            // Close others? Maybe not needed
+            container.style.display = 'block';
+            joinTicketRoom(ticketId);
+        } else {
+            container.style.display = 'none';
+            activeTicketId = null;
+        }
+    }
+
+    function displayChatHistory(messages) {
+        if (!activeTicketId) return;
+        const historyDiv = document.getElementById(`chat-history-${activeTicketId}`);
+        if (!historyDiv) return;
+
+        historyDiv.innerHTML = messages.map(msg => {
+            const isOwn = msg.userId === currentUser.id;
+            return `
+                <div style="margin-bottom: 10px; text-align: ${isOwn ? 'right' : 'left'};">
+                    <div style="display: inline-block; max-width: 80%; padding: 8px 12px; border-radius: 8px; background: ${isOwn ? 'var(--accent-red)' : 'var(--black-lighter)'}; color: white;">
+                        <div style="font-size: 0.8rem; margin-bottom: 4px; font-weight: bold; opacity: 0.8;">${msg.username} ${msg.isAdmin ? '(Admin)' : ''}</div>
+                        <div>${msg.message}</div>
+                        <div style="font-size: 0.7rem; margin-top: 4px; opacity: 0.6; text-align: right;">${new Date(msg.timestamp).toLocaleTimeString()}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        historyDiv.scrollTop = historyDiv.scrollHeight;
+    }
+
+    function displayMessage(message) {
+        if (!activeTicketId) return;
+        const historyDiv = document.getElementById(`chat-history-${activeTicketId}`);
+        if (!historyDiv) return;
+
+        const isOwn = message.userId === currentUser.id;
+        const msgHtml = `
+            <div style="margin-bottom: 10px; text-align: ${isOwn ? 'right' : 'left'};">
+                <div style="display: inline-block; max-width: 80%; padding: 8px 12px; border-radius: 8px; background: ${isOwn ? 'var(--accent-red)' : 'var(--black-lighter)'}; color: white;">
+                    <div style="font-size: 0.8rem; margin-bottom: 4px; font-weight: bold; opacity: 0.8;">${message.username} ${message.isAdmin ? '(Admin)' : ''}</div>
+                    <div>${message.message}</div>
+                    <div style="font-size: 0.7rem; margin-top: 4px; opacity: 0.6; text-align: right;">${new Date(message.timestamp).toLocaleTimeString()}</div>
+                </div>
+            </div>
+        `;
+        
+        historyDiv.insertAdjacentHTML('beforeend', msgHtml);
+        historyDiv.scrollTop = historyDiv.scrollHeight;
+    }
+
+    async function markAsRead(ticketId) {
+      try {
+        const response = await fetch(`/tickets/${ticketId}/mark-read`, {
+          method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+          loadMyTickets();
+        }
+      } catch (error) {
+        console.error('Error marking ticket as read:', error);
+      }
+    }
+  </script>
+</body>
+</html>

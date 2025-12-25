@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Slovenskí Patrioti</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="../images/SPlogo-edited.png" type="image/png">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-box">
+      <h2>Sign Up</h2>
+      <div id="message"></div>
+      <form id="signupForm">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required minlength="4">
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required minlength="4">
+        </div>
+        <button type="submit" class="btn-submit">Sign Up</button>
+      </form>
+      <div class="auth-links">
+        <p>Already have an account? <a href="login.html">Login</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const signupForm = document.getElementById('signupForm');
+    const messageDiv = document.getElementById('message');
+
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      messageDiv.innerHTML = '';
+
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (password !== confirmPassword) {
+        messageDiv.innerHTML = '<div class="error-message">Passwords do not match!</div>';
+        return;
+      }
+
+      try {
+        const response = await fetch('/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password, confirmPassword })
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+          window.location.href = 'login.html?signup=success';
+        } else {
+          messageDiv.innerHTML = `<div class="error-message">${data.message}</div>`;
+        }
+      } catch (error) {
+        messageDiv.innerHTML = '<div class="error-message">An error occurred. Please try again.</div>';
+      }
+    });
+  </script>
+</body>
+</html>

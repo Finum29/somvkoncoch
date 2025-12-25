@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Management - Slovenskí Patrioti</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="../images/SPlogo-edited.png" type="image/png">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav-fixed">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="../images/SPlogo-web-nav-edited.png" alt="Slovak Patriot Logo" onclick="window.location.href='../index.html'">
+      </div>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="team-management.html">My Team</a>
+      </div>
+      <div class="nav-auth">
+        <span class="nav-user"></span>
+        <button class="nav-logout">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="auth-container">
+    <div class="auth-box" style="max-width: 800px;">
+      <h2>Team Management</h2>
+      <div id="loginRequired" style="display:none;">
+        <div class="error-message">
+          Please <a href="login.html" style="color: var(--accent-red); text-decoration: underline;">login</a> to manage your team.
+        </div>
+      </div>
+      <div id="noTeam" style="display:none;">
+        <p style="color: var(--gray); text-align: center;">You are not in a team yet.</p>
+        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+          <button class="btn-submit" onclick="window.location.href='../index.html'">Create Team</button>
+          <button class="btn-submit" style="background: #4444FF;" onclick="window.location.href='../index.html'">Join Team</button>
+        </div>
+      </div>
+      <div id="teamContainer" style="display:none;">
+        <div id="teamDetails"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../scripts/auth.js"></script>
+  <script src="../scripts/teams.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const sessionResponse = await fetch('/session');
+      const sessionData = await sessionResponse.json();
+
+      const loginRequired = document.getElementById('loginRequired');
+      const noTeam = document.getElementById('noTeam');
+      const teamContainer = document.getElementById('teamContainer');
+
+      if (!sessionData.loggedIn) {
+        loginRequired.style.display = 'block';
+        noTeam.style.display = 'none';
+        teamContainer.style.display = 'none';
+      } else if (!sessionData.user.teamId) {
+        loginRequired.style.display = 'none';
+        noTeam.style.display = 'block';
+        teamContainer.style.display = 'none';
+      } else {
+        loginRequired.style.display = 'none';
+        noTeam.style.display = 'none';
+        teamContainer.style.display = 'block';
+        loadTeamDetails(sessionData.user.teamId, sessionData.user.id);
+      }
+    });
+
+    async function loadTeamDetails(teamId, userId) {
+      try {
+        const response = await fetch(`/teams/${teamId}`);
+        const data = await response.json();
+
+        if (data.ok) {
+          displayTeamDetails(data.team, userId);
+        }
+      } catch (error) {
+        console.error('Error loading team details:', error);
+      }
+    }
+
+    function displayTeamDetails(team, userId) {
+      const teamDetails = document.getElementById('teamDetails');
+      const isCaptain = team.captainId === userId;
+
+      teamDetails.innerHTML = `
+        <div class="admin-card">
+          <div class="card-header">
+            <h3>${team.name}</h3>
+            ${isCaptain ? '<span style="color: var(--accent-red);">YOU ARE CAPTAIN</span>' : ''}
+          </div>
+          <div class="card-body">
+            <p><strong>Description:</strong> ${team.description || 'None'}</p>
+            <p><strong>Motto:</strong> ${team.motto || 'None'}</p>
+            <p><strong>Invite Code:</strong> <span style="color: var(--accent-red); font-size: 1.2rem; font-weight: bold;">${team.inviteCode}</span></p>
+
+
+
+
+
+            <p style="color: var(--gray); font-size: 0.9rem; margin-top: 5px;">Share this code with friends to invite them to your team!</p>
+            
+            <div style="margin-top: 20px;">
+              <strong>Team Members (${team.memberDetails.length}):</strong>
+              <div style="margin-top: 10px;">
+                ${team.memberDetails.map(member => `
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--black); border-radius: 6px; margin-bottom: 8px;">
+                    <div>
+                      <span style="color: var(--white); font-weight: bold;">${member.username}</span>
+                      ${member.isCaptain ? '<span style="color: var(--accent-red); margin-left: 10px; font-size: 0.85rem;">(Captain)</span>' : ''}
+                    </div>
+                    ${isCaptain && !member.isCaptain ? `
+                      <button class="btn btn-delete" style="padding: 6px 12px; font-size: 0.85rem;" onclick="kickMember('${team.id}', '${member.id}', '${member.username}')">Kick</button>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+          <div class="card-actions">
+            ${isCaptain ? `
+              <button class="btn btn-edit" onclick="transferCaptaincy('${team.id}')">Transfer Captaincy</button>
+              <button class="btn btn-delete" onclick="disbandTeam('${team.id}', '${team.name}')">Disband Team</button>
+            ` : `
+              <button class="btn btn-cancel" onclick="leaveTeam()">Leave Team</button>
+            `}
+          </div>
+        </div>
+      `;
+    }
+
+    async function transferCaptaincy(teamId) {
+      const response = await fetch(`/teams/${teamId}`);
+      const data = await response.json();
+      
+      if (!data.ok) {
+        alert('Failed to load team data');
+        return;
+      }
+
+      const team = data.team;
+      const nonCaptainMembers = team.memberDetails.filter(m => !m.isCaptain);
+
+      if (nonCaptainMembers.length === 0) {
+        alert('No other members to transfer captaincy to');
+        return;
+      }
+
+      const memberList = nonCaptainMembers.map(m => m.username).join('\n');
+      const newCaptainName = prompt(`Select new captain:\n\n${memberList}\n\nEnter username:`);
+      
+      if (!newCaptainName) return;
+
+      const newCaptain = nonCaptainMembers.find(m => m.username === newCaptainName);
+      if (!newCaptain) {
+        alert('Invalid username');
+        return;
+      }
+
+      try {
+        const transferResponse = await fetch(`/teams/${teamId}/transfer`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newCaptainId: newCaptain.id })
+        });
+
+        const transferData = await transferResponse.json();
+
+        if (transferData.ok) {
+          alert(`Captaincy transferred to ${newCaptainName}`);
+          window.location.reload();
+        } else {
+          alert(transferData.message);
+        }
+      } catch (error) {
+        console.error('Error transferring captaincy:', error);
+        alert('Failed to transfer captaincy');
+      }
+    }
+
+    async function disbandTeam(teamId, teamName) {
+      if (!confirm(`Are you sure you want to DISBAND "${teamName}"? All members will be removed and this cannot be undone.`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/teams/${teamId}/disband`, {
+          method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+          alert('Team disbanded successfully');
+          window.location.href = '../index.html';
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error('Error disbanding team:', error);
+        alert('Failed to disband team');
+      }
+    }
+  </script>
+</body>
+</html>
