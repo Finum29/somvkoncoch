@@ -10,19 +10,19 @@ const cron = require('node-cron');
 
 const app = express();
 const server = http.createServer(app);
-
 const wss = new WebSocket.Server({ server });
-
 
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static React build files instead of 'public'
+app.use(express.static(path.join(__dirname, 'build')));
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Serve React app for all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-
+// JSON file paths
 const USERS_FILE = path.join(__dirname, 'users.json');
 const EVENTS_FILE = path.join(__dirname, 'events.json');
 const TEAMS_FILE = path.join(__dirname, 'teams.json');
@@ -31,6 +31,17 @@ const CHAT_FILE = path.join(__dirname, 'chat.json');
 const RESET_TOKENS_FILE = path.join(__dirname, 'reset-tokens.json');
 const PUSH_SUBSCRIPTIONS_FILE = path.join(__dirname, 'push-subscriptions.json');
 const TOURNAMENT_CHAT_FILE = path.join(__dirname, 'tournament-chat.json');
+
+// Example: parse JSON body
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Your WebSocket, cron jobs, API routes, etc. go here
+
+// Start server
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 // --- Helper functions for data persistence ---
 function readJSON(file, defaultValue = []) {
